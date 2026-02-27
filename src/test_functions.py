@@ -1,9 +1,10 @@
 import unittest
 
-from functions import split_nodes_delimiter
+from functions import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 from textnode import TextNode, TextType
 
 class TestFunctions(unittest.TestCase):
+    # split_nodes_delimiter
     def test_empty(self):
         old_nodes = []
         split_nodes = split_nodes_delimiter(old_nodes, "`", TextType.CODE)
@@ -66,6 +67,20 @@ class TestFunctions(unittest.TestCase):
         old_nodes = [TextNode("A sentence with a **missing delimiter", TextType.TEXT)]
         with self.assertRaises(Exception):
             split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
+    
+    # extract_markdown_images
+    def test_extract_markdown_images(self):
+        matches = extract_markdown_images(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
+
+    # extract_markdown_links
+    def test_extract_markdown_links(self):
+        matches = extract_markdown_links(
+            "This is text with a [link](https://en.wikipedia.org/wiki/HTML_element)"
+        )
+        self.assertListEqual([("link", "https://en.wikipedia.org/wiki/HTML_element")], matches)
 
 if __name__ == "__main__":
     unittest.main()
