@@ -1,6 +1,6 @@
 import unittest
 
-from functions import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
+from functions import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
 from textnode import TextNode, TextType
 
 class TestFunctions(unittest.TestCase):
@@ -81,6 +81,63 @@ class TestFunctions(unittest.TestCase):
             "This is text with a [link](https://en.wikipedia.org/wiki/HTML_element)"
         )
         self.assertListEqual([("link", "https://en.wikipedia.org/wiki/HTML_element")], matches)
+
+    # split image text
+    def test_split_images(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode("second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"),
+            ],
+        new_nodes
+        )
+    
+    # split link text
+    def test_split_links(self):
+        node = TextNode(
+            "This is text with a [link](https://i.imgur.com/zjjcJKZ.png) and another [link](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://i.imgur.com/3elNhQu.png"),
+            ],
+        new_nodes
+        )
+
+    # empty image
+    def test_empty_image(self):
+        node = TextNode(
+            "",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual([node],new_nodes)
+
+# more tests for split_nodes_image and split_nodes_link
+# Multiple Items: What if a single node has two or three images in it?
+# "This has ![one](url1) and ![two](url2)"
+
+# No Text Between Items: What happens if two images are right next to each other?
+# "![img1](url1)![img2](url2)"
+
+# Start and End: Does it work if the image is the very first thing in the string? Or the very last?
+# "![first](url) is at the start"
+# "The end is ![last](url)"
+
+# Non-Text Nodes: What if you pass in a list that already contains a TextType.BOLD node? Your function should leave it alone and return it as-is.
+# The "Almost" Match: For links, what if there is an image? split_nodes_link should ignore ![image](url) and only split on [link](url). (Your extract_markdown_links function already handles this with that clever regex!)
 
 if __name__ == "__main__":
     unittest.main()
