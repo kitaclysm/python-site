@@ -1,6 +1,6 @@
 import unittest
 
-from functions import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
+from functions import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
 from textnode import TextNode, TextType
 
 class TestFunctions(unittest.TestCase):
@@ -138,6 +138,23 @@ class TestFunctions(unittest.TestCase):
 
 # Non-Text Nodes: What if you pass in a list that already contains a TextType.BOLD node? Your function should leave it alone and return it as-is.
 # The "Almost" Match: For links, what if there is an image? split_nodes_link should ignore ![image](url) and only split on [link](url). (Your extract_markdown_links function already handles this with that clever regex!)
+
+    def test_text_to_textnodes(self):
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        noded_text = text_to_textnodes(text)
+        self.assertEqual([
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ], noded_text
+        )
 
 if __name__ == "__main__":
     unittest.main()
