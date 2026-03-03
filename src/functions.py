@@ -82,3 +82,13 @@ def text_to_textnodes(text):
 	formatted = split_nodes_link(formatted)
 	
 	return formatted
+
+def markdown_to_blocks(markdown):
+	separated = markdown.split("\n\n")
+	blocks = []
+	for item in separated:
+		block = item.strip()
+		if block != "":
+			blocks.append(block)
+	return blocks
+			
