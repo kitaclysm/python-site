@@ -24,18 +24,18 @@ class TextNode:
         return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
 
 def text_node_to_html_node(text_node):
-    match text_node.text_type:
-        case TextType.TEXT:
-            return LeafNode(None, text_node.text, None)
-        case TextType.BOLD:
-            return LeafNode("b", text_node.text, None)
-        case TextType.ITALIC:
-            return LeafNode("i", text_node.text)
-        case TextType.CODE:
-            return LeafNode("code", text_node.text, None)
-        case TextType.LINK:
-            return LeafNode("a", text_node.text, {"href": text_node.url})
-        case TextType.IMAGE:
-            return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
-        case _:
-            raise Exception("improper text node type")
+    t_type = text_node.text_type
+    if t_type is TextType.TEXT:
+        return LeafNode(None, text_node.text, None)
+    elif t_type is TextType.BOLD:
+        return LeafNode("b", text_node.text, None)
+    elif t_type is TextType.ITALIC:
+        return LeafNode("i", text_node.text)
+    elif t_type is TextType.CODE:
+        return LeafNode("code", text_node.text, None)
+    elif t_type is TextType.LINK:
+        return LeafNode("a", text_node.text, {"href": text_node.url})
+    elif t_type is TextType.IMAGE:
+        return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
+    else:
+        raise Exception("improper text node type")
